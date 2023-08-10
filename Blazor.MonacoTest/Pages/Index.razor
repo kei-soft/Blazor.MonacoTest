@@ -1,0 +1,60 @@
+﻿@page "/"
+
+<h3>BlazorMonaco</h3>
+
+<style>
+    .myeditor {
+        height: 400px;
+        width: 100%;
+        border: 1px solid gray;
+    }
+</style>
+
+<div>
+    <div style="margin:10px 0;">
+        Select Theme:
+        <select @onchange="ChangeTheme">
+            <option value="vs">Visual Studio</option>
+            <option value="vs-dark">Visual Studio Dark</option>
+        </select>
+    </div>
+</div>
+
+<StandaloneCodeEditor @ref="editor" CssClass="myeditor" ConstructionOptions="EditorConstructionOptions" />
+
+@code {
+    private StandaloneCodeEditor editor = null!;
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+                {
+                    Language = "csharp",
+                    GlyphMargin = true,
+                    Value = @"
+using Blazor.MonacoTest;
+
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+namespace Blazor.MonacoTest
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+            await builder.Build().RunAsync();
+        }
+    }
+}"
+                };
+    }
+
+    private async Task ChangeTheme(ChangeEventArgs e)
+    {
+        await Global.SetTheme(e.Value?.ToString());
+    }
+}
